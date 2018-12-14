@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+  <title>Pedestrian and Bicyclist Safety Risk Assessment Tool</title>
+
+  <link rel="stylesheet" href="https://js.arcgis.com/4.10/esri/css/main.css">
+  <script src="https://js.arcgis.com/4.10/"></script>
+
+  <script>
+    require([
+        "esri/Map",
+        "esri/views/MapView",
+        "esri/layers/FeatureLayer", 
+        "esri/widgets/Search", 
+        "esri/renderers/ClassBreaksRenderer",
+        "esri/widgets/Legend",       
+        "esri/renderers/smartMapping/creators/color",
+        "esri/renderers/smartMapping/statistics/histogram",
+        "esri/widgets/ColorSlider",
+        "esri/core/lang"
+      ],
+      function(
+        Map, MapView,FeatureLayer, 
+        Search, ClassBreaksRenderer, 
+        Legend, colorRendererCreator, 
+        histogram, ColorSlider, lang
+      ) {
+
+        const map = new Map({
+          basemap: "dark-gray"
+        });
+
+        const view = new MapView({
+          container: "sceneDiv",
+          map: map,
+          center: [-83.7430, 42.2808],
+          zoom: 13,
+
+        });
+
+        // search widget ============================================================
+        var searchWidget = new Search({
+          view: view, 
+          popupEnabled: false
+        });
+
+        view.ui.add(searchWidget, {
+          position: "top-right"
+        });
+        // ==========================================================================
+
+        view.ui.add("infoDiv", "top-left");
+
+        const listNode = document.getElementById("nyc_graphics");
+
+        // Create the PopupTemplate
+        const popupTemplatePolygon = { // autocasts as new PopupTemplate()
+          title: "Polygon information, FID: {FID}",
+          content: [{
+            type: "fields",
+            fieldInfos: [{
+              fieldName: "FID",
+              label: "FID",
+              format: {
+                places: 0,
+                digitSeparator: true
+              }
+            }, {
+              fieldName: "BErank",
+              label: "BErank",
+              format: {
+                places: 0,
+                digitSeparator: true
+              }
+            }, {
+              fieldName: "BIErank",
+              label: "BIErank",
+              format: {
+                places: 0,
+                digitSeparator: true
+              }
+            }, {
+              fieldName: "BRrank",
+              label: "BRrank",
+              format: {
+                places: 0,
+                digitSeparator: true
+              }
+            },{
+              fieldName: "Bie",
+              label: "Bie",
+              format: {
+                places: 0,
+                digitSeparator: true
+              }
+            }, {
+              fieldName: "BikeCrashC",
+              label: "BikeCrashC",
+              format: {
+                places: 0,
+                digitSeparator: true
+              }
+            }, {
+              fieldName: "BikeExp",
+              label: "BikeExp",
+              format: {
+                places: 0,
+                digitSeparator: true
+              }
+            }, {
+              fieldName: "Bike_Risk",
+              label: "Bike_Risk",
+              format: {
+                places: 0,
+                digitSeparator: true
+              }
+            }, {
+              fieldName: "NMErank",
+              label: "NMErank",
+              format: {
+                places: 0,
+                digitSeparator: true
+              }
+            }, {
+              fieldName: "NMExp",
+              label: "NMExp",
+              format: {
+                places: 0,
+                digitSeparator: true
+              }
+            }, {
+              fieldName: "NMRisk",
+              label: "NMRisk",
+              format: {
+                places: 0,
+                digitSeparator: true
+              }
+            }, {
+              fieldName: "NMRrank",
+              label: "NMRrank",
+              format: {
+                places: 0,
+                digitSeparator: true
+              }
+            }, {
+              fieldName: "PErank",
+              label: "PErank",
+              format: {
+                places: 0,
+                digitSeparator: true
+              }
+            }, {
+              fieldName: "PIErank",
+              label: "PIErank",
+              format: {
+                places: 0,
+                digitSeparator: true
+              }
+            }, {
+              fieldName: "PRrank",
+              label: "PRrank",
+              format: {
+                places: 0,
+                digitSeparator: true
+              }
+            },{
+              fieldName: "PedCrashCt",
+              label: "PedCrashCt",
+              format: {
+                places: 0,
+                digitSeparator: true
+              }
+            }, {
+              fieldName: "Pie",
+              label: "Pie",
+              format: {
+                places: 0,
+                digitSeparator: true
+              }
+            },{
+              fieldName: "PedExp",
+              label: "PedExp",
+              format: {
+                places: 0,
+                digitSeparator: true
+              }
+            }, {
+              fieldName: "Ped_Risk",
+              label: "Ped_Risk",
+              format: {
+                places: 0,
+                digitSeparator: true
+              }
+            },{
+              fieldName: "Rid",
+              label: "Rid",
+              format: {
+                places: 0,
+                digitSeparator: true
+              }
+            },{
+              fieldName: "fips",
+              label: "fips",
+              format: {
+                places: 0,
+                digitSeparator: true
+              }
+            }]
+          }]
+        };
+
+        const popupTemplateLineBike = { // autocasts as new PopupTemplate()
+          title: "Bike road information, FID: {FID}",
+          content: [{
+            type: "fields",
+            fieldInfos: [{
+              fieldName: "FID",
+              label: "FID",
+              format: {
+                places: 0,
+                digitSeparator: true
+              }
+            }, {
+              fieldName: "rank",
+              label: "rank",
+              format: {
+                places: 0,
+                digitSeparator: true
+              }
+            }, {
+              fieldName: "weight",
+              label: "weight",
+              format: {
+                places: 0,
+                digitSeparator: true
+              }
+            }]
+          }]
+        };
+
+        const popupTemplateLinePed = { // autocasts as new PopupTemplate()
+          title: "Pedestrian road information, FID: {FID}",
+          content: [{
+            type: "fields",
+            fieldInfos: [{
+              fieldName: "FID",
+              label: "FID",
+              format: {
+                places: 0,
+                digitSeparator: true
+              }
+            }, {
+              fieldName: "rank",
+              label: "rank",
+              format: {
+                places: 0,
+                digitSeparator: true
+              }
+            }, {
+              fieldName: "weight",
+              label: "weight",
+              format: {
+                places: 0,
+                digitSeparator: true
+              }
+            }]
+          }]
+        };
+
+        const popupTemplatePoint = { // autocasts as new PopupTemplate()
+          title: "Point information, ID: {idx}",
+          content: [{
+            type: "fields",
+            fieldInfos: [{
+              fieldName: "idx",
+              label: "idx",
+              format: {
+                places: 0,
+                digitSeparator: true
+              }
+            }, {
+              fieldName: "year",
+              label: "year",
+              format: {
+                places: 0,
+                digitSeparator: true
+              }
+            }, {
+              fieldName: "month",
+              label: "month",
+              format: {
+                places: 0,
+                digitSeparator: true
+              }
+            }, {
+              fieldName: "day",
+              label: "day",
+              format: {
+                places: 0,
+                digitSeparator: true
+              }
+            }, {
+              fieldName: "time",
+              label: "time",
+              format: {
+                places: 0,
+                digitSeparator: true
+              }
+            }, {
+              fieldName: "worst_injury",
+              label: "worst_injury",
+              format: {
+                places: 0,
+                digitSeparator: true
+              }
+            }, {
+              fieldName: "type",
+              label: "type",
+              format: {
+                places: 0,
+                digitSeparator: true
+              }
+            }]
+          }]
+        };
+
+        const less25 = {
+          type: "simple-fill",  // autocasts as new SimpleFillSymbol()
+          color: "#fffcd4",
+          style: "solid",
+          outline: {
+            width: 0.2,
+            color: [ 255, 255, 255, 0.5 ]
+          }
+        };
+        const less50 = {
+          type: "simple-fill",  // autocasts as new SimpleFillSymbol()
+          color: "#b1cdc2",
+          style: "solid",
+          outline: {
+            width: 0.2,
+            color: [ 255, 255, 255, 0.5 ]
+          }
+        };
+        const more50 = {
+          type: "simple-fill",  // autocasts as new SimpleFillSymbol()
+          color: "#38627a",
+          style: "solid",
+          outline: {
+            width: 0.2,
+            color: [ 255, 255, 255, 0.5 ]
+          }
+        };
+        const more75 = {
+          type: "simple-fill",  // autocasts as new SimpleFillSymbol()
+          color: "#0d2644",
+          style: "solid",
+          outline: {
+            width: 0.2,
+            color: [ 255, 255, 255, 0.5 ]
+          }
+        };
+
+        // const rendererPolygonPie = {
+        //   type: "class-breaks", 
+        //   field: "Pie",  
+        //   legendOptions: {title: "Pie values"},
+        //   defaultSymbol: {
+        //     type: "simple-fill",  
+        //     color: "black",
+        //     style: "backward-diagonal",
+        //     outline: {
+        //       width: 0.5,
+        //       color: [50,50,50,0.6]
+        //     }
+        //   },
+        //   defaultLabel: "no data", 
+
+        //   classBreakInfos: [{
+        //     minValue: 0,
+        //     maxValue: 6.999,
+        //     symbol: less25,
+        //     label: "< 7" 
+        //   }, {
+        //     minValue: 7.0,
+        //     maxValue: 17.499,
+        //     symbol: less50,
+        //     label: "7 - 17.5" 
+        //   }, {
+        //     minValue: 17.5,
+        //     maxValue: 28.499,
+        //     symbol: more50,
+        //     label: "17.5 - 28.5"
+        //   }, {
+        //     minValue: 28.5,
+        //     maxValue: 500,
+        //     symbol: more75,
+        //     label: "> 28.5" 
+        //   }]
+        // };
+
+        const schoolSym = {
+          type: "simple-marker", // autocasts as new SimpleLineSymbol()
+          color: "orange",
+          width: 5,
+          style: "circle"
+        };
+        const barSym = {
+          type: "simple-marker", // autocasts as new SimpleLineSymbol()
+          color: "#blue",
+          width: 5,
+          style: "square"
+        };
+        const bikeSym = {
+          type: "simple-marker", // autocasts as new SimpleLineSymbol()
+          color: "red",
+          width: 5,
+          style: "diamond"
+        };
+        const pedSym = {
+          type: "simple-marker", // autocasts as new SimpleLineSymbol()
+          color: "green",
+          width: 5,
+          style: "triangle"
+        };
+
+        const rendererPoint = {
+          type: "unique-value", // autocasts as new UniqueValueRenderer()
+          legendOptions: {
+            title: "Accident Type"
+          },
+          field: "type",
+          uniqueValueInfos: [{
+            value: "pedestrian", // code for interstates/freeways
+            symbol: pedSym,
+            label: "pedestrian crash"
+          }, {
+            value: "bike", // code for U.S. highways
+            symbol: bikeSym,
+            label: "bike crash"
+          }, {
+            value: "bars", // code for U.S. highways
+            symbol: barSym,
+            label: "bar accidents"
+          }, {
+            value: "school", // code for U.S. highways
+            symbol: schoolSym,
+            label: "school accidents"
+          }]
+        };
+
+        function findMaxMin(inputField){
+          if(inputField == "Bie" || inputField == "Pie" ){
+            return [5, 27];
+          }
+          else if (inputField == "BikeCrashC"){
+            return [0, 30];
+          }
+          else if (inputField == "BikeExp"){
+            return [0, 35];
+          }
+          else if (inputField == "Bike_Risk"){
+            return [0, 2.7];
+          }
+          else if (inputField == "NMExp"){
+            return [0, 112];
+          }
+          else if (inputField == "NMRisk"){
+            return [0, 5];
+          }
+          else if (inputField == "PedCrashCt"){
+            return [0, 45];
+          }
+          else if (inputField == "PedExp"){
+            return [0, 30];
+          }
+          else if (inputField == "Ped_Risk"){
+            return [0, 3.8];
+          }
+          else {
+            console.log("Error in attribute max min value");
+            return [0, 10];
+          }
+        }
+
+        function generatePolygonRenderer(inputField){
+
+          minMaxValue = findMaxMin(inputField); 
+
+          const defaultSym = {
+            type: "simple-fill", 
+            outline: { 
+              color: [128, 128, 128, 0.2],
+              width: "0.5px"
+            }
+          };
+
+          const colorVisVar = {
+            type: "color",
+            field: inputField,
+            stops: [
+              { value: minMaxValue[0], color: "#FFFCD4" },
+              { value: minMaxValue[1], color: "#0D2644" }
+            ],
+            legendOptions: {
+              title: "Polygon " + inputField + " value"
+            }
+          };
+
+          const rendererPolygonPie = {
+            type: "simple", // autocasts as new SimpleRenderer()
+            symbol: defaultSym,
+            label: "Polygon",
+            visualVariables: colorVisVar
+          };
+
+          return rendererPolygonPie;
+        }
+  
+        rendererPolygon = generatePolygonRenderer("Pie");
+
+        // Adding polygon featureLayer 
+        const polygonLayer = new FeatureLayer({
+          url: "https://services1.arcgis.com/4ezfu5dIwH83BUNL/arcgis/rest/services/pedbike_IE_NM_Michigan/FeatureServer/0",
+          outFields: ["*"],
+          popupTemplate: popupTemplatePolygon,
+          renderer: rendererPolygon,
+          opacity:0.5
+        });
+        map.add(polygonLayer);
+
+        const lineBikeLayer = new FeatureLayer({
+          url: "https://services1.arcgis.com/4ezfu5dIwH83BUNL/arcgis/rest/services/bike_roadwgts_Michigan/FeatureServer/0",
+          outFields: ["*"],
+          popupTemplate: popupTemplateLineBike,
+          id: "likeBikeLayer",
+          visible: false
+        });
+
+        const linePedLayer = new FeatureLayer({
+          url: "https://services1.arcgis.com/4ezfu5dIwH83BUNL/arcgis/rest/services/pedestrian_roadwgts_Michigan/FeatureServer/0",
+          outFields: ["*"],
+          popupTemplate: popupTemplateLinePed,
+          id: "likePedLayer",
+          visible: false
+        });
+
+        var colorParamsPed = {
+          layer: linePedLayer,
+          basemap: map.basemap,
+          field: "Shape__Length",
+          theme: "above-and-below"
+        };
+
+        var sliderParamsPed = {
+          numHandles: 3,
+          syncedHandles: true,
+          container: "slider"
+        };
+
+        var colorParamsBike = {
+          layer: lineBikeLayer,
+          basemap: map.basemap,
+          field: "Shape__Length",
+          theme: "above-and-below"
+        };
+
+        var sliderParamsBike = {
+          numHandles: 3,
+          syncedHandles: true,
+          container: "slider"
+        };
+
+        const pointLayer = new FeatureLayer({
+          url: "https://services1.arcgis.com/4ezfu5dIwH83BUNL/arcgis/rest/services/Points_of_Interest/FeatureServer/0",
+          outFields: ["*"],
+          popupTemplate: popupTemplatePoint,
+          renderer: rendererPoint,
+          visible: false,
+          opacity: 0.5
+        });
+        map.add(pointLayer);
+
+
+        // legend widget ============================================================
+        const legend = new Legend({
+          view: view
+        });
+
+        view.ui.add(legend, "bottom-left");
+        // ==========================================================================
+
+        let graphics;
+
+        view.whenLayerView(polygonLayer).then(function(layerView) {
+          let highlight;
+          // listen for the pointer-move event on the View
+          view.on("pointer-move", function(event) {
+            // Perform a hitTest on the View
+            view.hitTest(event).then(function(event) {
+              // Make sure graphic has a popupTemplate
+              let results = event.results.filter(function(
+                result) {
+                return result.graphic.layer.popupTemplate;
+              });
+              let result = results[0];
+              highlight && highlight.remove();
+              // Update the graphic of the Feature widget
+              // on pointer-move with the result
+              if (result) {
+                feature.graphic = result.graphic;
+                highlight = layerView.highlight(result.graphic);
+              } else {
+                feature.graphic = graphic;
+              }
+            });
+          });
+        });
+
+//----------------------------------------------------------------------------------------------------
+        colorRendererCreator.createContinuousRenderer(colorParamsPed)
+          .then(function(response) {
+
+            // set the renderer to the layer and add it to the map
+            linePedLayer.renderer = response.renderer;
+            map.add(linePedLayer);
+
+            // add the statistics and color visual variable objects
+            // to the color slider parameters
+            sliderParamsPed.statistics = response.statistics;
+            sliderParamsPed.visualVariable = response.visualVariable;
+
+            // generate a histogram for use in the slider. Input the layer
+            // and field or arcade expression to generate it.
+            return histogram({
+              layer: linePedLayer,
+              field: "Shape__Length"
+            });
+          })
+          .then(function(histogram) {
+
+            // when it resolves set the histogram in the slider parameters
+            sliderParamsPed.histogram = histogram;
+
+            // input the slider parameters in the slider's constructor
+            // and add it to the view's UI
+            var colorSlider = new ColorSlider(sliderParamsPed);
+            view.ui.add("containerDiv", "bottom-left");
+
+            // when the user slides the handle(s), update the renderer
+            // with the updated color visual variable object
+            colorSlider.on("data-change", function() {
+              var renderer = linePedLayer.renderer.clone();
+              renderer.visualVariables = [lang.clone(colorSlider.visualVariable)];
+              linePedLayer.renderer = renderer;
+            });
+          })
+          .catch(function(error) {
+            console.log("there was an error: ", error);
+          });
+//----------------------------------------------------------------------------------------------------
+        colorRendererCreator.createContinuousRenderer(colorParamsBike)
+          .then(function(response) {
+
+            // set the renderer to the layer and add it to the map
+            lineBikeLayer.renderer = response.renderer;
+            map.add(lineBikeLayer);
+
+            // add the statistics and color visual variable objects
+            // to the color slider parameters
+            sliderParamsBike.statistics = response.statistics;
+            sliderParamsBike.visualVariable = response.visualVariable;
+
+            // generate a histogram for use in the slider. Input the layer
+            // and field or arcade expression to generate it.
+            return histogram({
+              layer: lineBikeLayer,
+              field: "Shape__Length"
+            });
+          })
+          .then(function(histogram) {
+            // when it resolves set the histogram in the slider parameters
+            sliderParamsBike.histogram = histogram;
+
+            // input the slider parameters in the slider's constructor
+            // and add it to the view's UI
+            var colorSlider = new ColorSlider(sliderParamsBike);
+            view.ui.add("containerDiv", "bottom-left");
+
+            // when the user slides the handle(s), update the renderer
+            // with the updated color visual variable object
+            colorSlider.on("data-change", function() {
+              var renderer = lineBikeLayer.renderer.clone();
+              renderer.visualVariables = [lang.clone(colorSlider.visualVariable)];
+              lineBikeLayer.renderer = renderer;
+            });
+          })
+          .catch(function(error) {
+            console.log("there was an error: ", error);
+          });
+//----------------------------------------------------------------------------------------------------
+        function onListClickHandler(event) {
+          const target = event.target;
+          const resultId = target.getAttribute("data-m-id");
+
+          // get the graphic corresponding to the clicked zip code
+          const result = resultId && graphics && graphics[parseInt(resultId, 10)];
+
+          if (result) {
+            // open the popup at the centroid of zip code polygon
+            // and set the popup's features which will populate popup content and title.
+
+            view.goTo(result.geometry.extent.expand(2))
+              .then(function() {
+                view.popup.open({
+                  features: [result],
+                  location: result.geometry.centroid
+                });
+            });
+          }
+        }
+//----- select attribute ----------------------------------------------------------------------------------------------
+        var attributeTypeSelect = document.getElementById("att-type");
+
+        view.when(function () {
+            return polygonLayer.when(function () {
+              var query = polygonLayer.createQuery();
+              return polygonLayer.queryFeatures(query);
+            });
+          })
+          .then(getValues)
+          .then(addToSelect);
+
+        function getValues(response) {
+
+          // var features = response.fields;
+          // var fields = []; 
+
+          // for (var i = 1; i < features.length-4; i++) { 
+          //   fields.push(features[i].name);
+          // }
+          // console.log(fields);
+          
+          var fields = ["Bie", "BikeCrashC", "BikeExp", "Bike_Risk", "NMExp", "NMRisk", "PedCrashCt", "PedExp", "Ped_Risk", "Pie"];
+
+          return fields;
+        }
+
+        function addToSelect(values) {
+          values.forEach(function (value) {
+            var option = document.createElement("option");
+            option.text = value;
+            attributeTypeSelect.add(option);
+          });
+
+          return setAttributeDefinitionExpression(attributeTypeSelect.value);
+        }
+
+        // set the definition expression on the wells
+        // layer to reflect the selection of the user
+
+        function setAttributeDefinitionExpression(newValue) {
+          polygonLayer.renderer = generatePolygonRenderer(newValue);
+
+          if (!polygonLayer.visible) {
+            polygonLayer.visible = true;
+          }
+        }
+
+        attributeTypeSelect.addEventListener("change", function () {
+          var type = event.target.value;
+          setAttributeDefinitionExpression(type);
+        });
+        /*****************************************************************
+         * The visible property on the layer can be used to toggle the
+         * layer's visibility in the view. When the visibility is turned off
+         * the layer is still part of the map, which means you can access
+         * its properties and perform analysis even though it isn't visible.
+         *******************************************************************/
+        var pedLayerToggle = document.getElementById("pedLayer");
+        pedLayerToggle.addEventListener("change", function () {
+          linePedLayer.visible = pedLayerToggle.checked;
+        });
+        var bikeLayerToggle = document.getElementById("bikeLayer");
+        bikeLayerToggle.addEventListener("change", function () {
+          lineBikeLayer.visible = bikeLayerToggle.checked;
+        });
+        var pointLayerToggle = document.getElementById("pointLayer");
+        pointLayerToggle.addEventListener("change", function () {
+          pointLayer.visible = pointLayerToggle.checked;
+        });
+
+      });
+  </script>
+
+  <style>
+    html,
+    body,
+    #sceneDiv {
+      height: 100%;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: sans-serif;
+    }
+
+    #layerToggle {
+      top: 190px;
+      left: 15px;
+      position: absolute;
+      z-index: 99;
+      background-color: black;
+      color: #fff;
+      border-radius: 8px;
+      padding: 10px;
+      opacity: 1;
+    }
+
+    #infoDiv {
+      background-color: black;
+      color: #fff;
+      padding: 10px;
+      width: 200px;
+    }
+
+    .panel-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+/*    .panel-side {
+      padding: 2px;
+      box-sizing: border-box;
+      width: 300px;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      color: #fff;
+      background-color: rgba(0, 0, 0, 0);
+      overflow: auto;
+      z-index: 60;
+    }
+
+      .panel-result {
+      cursor: pointer;
+      margin: 2px 0;
+      background-color: rgba(0, 0, 0, 0.3);
+    }
+
+    .panel-result:hover,
+    .panel-result:focus {
+      color: orange;
+      background-color: rgba(0, 0, 0, 0.75);
+    }*/
+  </style>
+</head>
+
+<body>
+  <div class="panel-container">
+
+    <div id="infoDiv">
+      Select attribute type:
+      <select id="att-type"></select>
+      <br> Range:
+      <input id="range" type="range" min="10" max="10000" step="10" value="10000">&nbsp;
+      <span id="range-value"> </span>
+      <button id="query-range">Query </button>
+    </div>
+    
+    <span id="layerToggle">
+      Layers <br/>
+      <input type="checkbox" id="pedLayer"> Ped Road Layer <br/>
+      <input type="checkbox" id="bikeLayer"> Bike Road Layer <br/>
+      <input type="checkbox" id="pointLayer"> Points of Interest Layer
+    </span>
+
+    <div id="sceneDiv"></div>
+  </div>
+</body>
+</html>
