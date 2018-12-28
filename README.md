@@ -21,7 +21,7 @@ _Filter by value_ and _display by colored bins_ are only available for Bie and P
 - Open up ArcGIS Pro 
 - You would be prompted to log in with University of Michigan account
 - **Note** that login may not get you actually connected to ArcGIS Online portal the first time, you should click "Switch Active Portal" on the top right corner, log in through ArcGIS website (www.arcgis.com) using Enterprise Login, and then do "Switch Active Portal" back again to UM account (umich.maps.arcgis.com), should work then. 
-- Start a new project
+- Start a new project on ArcGIS Pro
 - Create a blank new map (Insert -> New Map)
 - Drag the shapefiles into the content section of the new map, the data should be displayed on the map if successful 
 - Share data to online (have to share each shapefile individually)
