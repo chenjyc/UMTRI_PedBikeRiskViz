@@ -331,6 +331,7 @@
           }]
         };
 
+        // Color bin individual bin definition
         const less25 = {
           type: "simple-fill",  // autocasts as new SimpleFillSymbol()
           color: "#fffcd4",
@@ -341,7 +342,7 @@
           }
         };
         const less50 = {
-          type: "simple-fill",  // autocasts as new SimpleFillSymbol()
+          type: "simple-fill",  
           color: "#b1cdc2",
           style: "solid",
           outline: {
@@ -350,7 +351,7 @@
           }
         };
         const more50 = {
-          type: "simple-fill",  // autocasts as new SimpleFillSymbol()
+          type: "simple-fill", 
           color: "#38627a",
           style: "solid",
           outline: {
@@ -359,7 +360,7 @@
           }
         };
         const more75 = {
-          type: "simple-fill",  // autocasts as new SimpleFillSymbol()
+          type: "simple-fill",  
           color: "#0d2644",
           style: "solid",
           outline: {
@@ -368,6 +369,7 @@
           }
         };
 
+        // Color bin definition Pie 
         const rendererPolygonPie = {
           type: "class-breaks", 
           field: "Pie",  
@@ -406,6 +408,7 @@
           }]
         };
 
+        // Color bin definition Bie 
         const rendererPolygonBie = {
           type: "class-breaks", 
           field: "Bie",  
@@ -444,93 +447,87 @@
           }]
         };
 
+        // Point layer definition by individual type
         const schoolSym = {
-          type: "simple-marker", // autocasts as new SimpleLineSymbol()
+          type: "simple-marker", 
           color: "orange",
           width: 5,
           style: "circle"
         };
 
         const barSym = {
-          type: "simple-marker", // autocasts as new SimpleLineSymbol()
+          type: "simple-marker", 
           color: "#blue",
           width: 5,
           style: "square"
         };
         
         const bikeSym = {
-          type: "simple-marker", // autocasts as new SimpleLineSymbol()
+          type: "simple-marker", 
           color: "red",
           width: 5,
           style: "diamond"
         };
         
         const pedSym = {
-          type: "simple-marker", // autocasts as new SimpleLineSymbol()
+          type: "simple-marker", 
           color: "green",
           width: 5,
           style: "triangle"
         };
 
+        // Point layer definition
         const rendererPoint = {
-          type: "unique-value", // autocasts as new UniqueValueRenderer()
+          type: "unique-value", 
           legendOptions: {
             title: "Accident Type"
           },
           field: "type",
           uniqueValueInfos: [{
-            value: "pedestrian", // code for interstates/freeways
+            value: "pedestrian",
             symbol: pedSym,
             label: "pedestrian crash"
           }, {
-            value: "bike", // code for U.S. highways
+            value: "bike", 
             symbol: bikeSym,
             label: "bike crash"
           }, {
-            value: "bars", // code for U.S. highways
+            value: "bars", 
             symbol: barSym,
             label: "bar accidents"
           }, {
-            value: "school", // code for U.S. highways
+            value: "school",
             symbol: schoolSym,
             label: "school accidents"
           }]
         };
 
         function findMaxMin(inputField){
-          if(inputField == "Bie" || inputField == "Pie" ){
-            return [5, 27];
-          }
-          else if (inputField == "BikeCrashC"){
-            return [0, 30];
-          }
-          else if (inputField == "BikeExp"){
-            return [0, 35];
-          }
-          else if (inputField == "Bike_Risk"){
-            return [0, 2.7];
-          }
-          else if (inputField == "NMExp"){
-            return [0, 112];
-          }
-          else if (inputField == "NMRisk"){
-            return [0, 5];
-          }
-          else if (inputField == "PedCrashCt"){
-            return [0, 45];
-          }
-          else if (inputField == "PedExp"){
-            return [0, 30];
-          }
-          else if (inputField == "Ped_Risk"){
-            return [0, 3.8];
-          }
+          if(inputField == "Bie" || inputField == "Pie" ) return [5, 27];
+          
+          else if (inputField == "BikeCrashC") return [0, 30];
+
+          else if (inputField == "BikeExp") return [0, 35];
+
+          else if (inputField == "Bike_Risk") return [0, 2.7];
+          
+          else if (inputField == "NMExp") return [0, 112];
+          
+          else if (inputField == "NMRisk") return [0, 5];
+          
+          else if (inputField == "PedCrashCt") return [0, 45];
+        
+          else if (inputField == "PedExp") return [0, 30];
+          
+          else if (inputField == "Ped_Risk") return [0, 3.8];
+          
           else {
             console.log("Error in attribute max min value");
             return [0, 10];
           }
         }
 
+        // Definition of polygon renderer with continuous color 
         function generatePolygonRenderer(inputField){
 
           const minMaxValue = findMaxMin(inputField); 
@@ -566,7 +563,7 @@
             rendererPolygon = rendererPolygonPie;
           }
 
-          if (inputField == "Bie"){
+          else if (inputField == "Bie"){
             rendererPolygon = rendererPolygonBie;
           }
 
@@ -717,7 +714,8 @@
           .then(addToSelect);
 
         function getValues(response) {
-          var fields = ["Bie", "BikeCrashC", "BikeExp", "Bike_Risk", "NMExp", "NMRisk", "PedCrashCt", "PedExp", "Ped_Risk", "Pie"];
+          var fields = ["Bie", "BikeCrashC", "BikeExp", "Bike_Risk", "NMExp", \
+                        "NMRisk", "PedCrashCt", "PedExp", "Ped_Risk", "Pie"];
 
           return fields;
         }
@@ -743,6 +741,7 @@
         }
 
         var attType = "Bie"; 
+        // event listening for attribute change 
         attributeTypeSelect.addEventListener("change", function () {
           attType = event.target.value;
           console.log(attType);
@@ -816,6 +815,7 @@
             polygonLayer.definitionExpression = ""; 
         }
 
+        // event listening to range change for filter 
         rangeSlider.addEventListener("input", function () {
           document.getElementById("range-value").innerText = rangeSlider.value;
         });
@@ -849,8 +849,8 @@
           pointLayer.visible = pointLayerToggle.checked;
         });
 
+        // Changing the visibility if the zoom level is too low
         watchUtils.whenTrue(view, "stationary", function() {
-          // Get the new center of the view only when view is stationary.
           if (view.zoom) {
             console.log("zoom level is", view.zoom);
 
