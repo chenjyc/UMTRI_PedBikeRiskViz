@@ -11,9 +11,9 @@ Functionalities
 	- Display by colored bins* 
 	- Display by continuous spectrum
 
-**Note* **:
+**Note**:
 
-Filter by value and display by colored bins are only available for Bie and Pie.  
+_Filter by value_ and _display by colored bins_ are only available for Bie and Pie attribute.  
 
 
 # Setting up data in ArcGIS Online 
@@ -34,8 +34,9 @@ Filter by value and display by colored bins are only available for Bie and Pie.
 
 
 # Javascript reference 
-ArcGIS Javascript API site(https://developers.arcgis.com/javascript/)
+ArcGIS Javascript API site
+- [API Reference](https://developers.arcgis.com/javascript/latest/api-reference/index.html)
+- [Sample code](https://developers.arcgis.com/javascript/latest/sample-code/index.html)
 
 # To do 
-- More specific of datasharing 
 - Files to MBox 
