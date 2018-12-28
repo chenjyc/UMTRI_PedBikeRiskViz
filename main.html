@@ -743,7 +743,6 @@
         // event listening for attribute change 
         attributeTypeSelect.addEventListener("change", function () {
           attType = event.target.value;
-          console.log(attType);
           setAttributeDefinitionExpression(attType);
         });
 
@@ -807,7 +806,6 @@
 
         function filterByValue(){
           var rangeSelectPercentage = parseInt(rangeSlider.value);
-          // console.log(attType, "and", rangeSelectPercentage);
           var rangeSelect = findAttFilter(attType, rangeSelectPercentage);
           polygonLayer.definitionExpression = attType +" > " + rangeSelect;
           if (rangeSelect == 0)
@@ -851,10 +849,8 @@
         // Changing the visibility if the zoom level is too low
         watchUtils.whenTrue(view, "stationary", function() {
           if (view.zoom) {
-            console.log("zoom level is", view.zoom);
-
-            if (view.zoom < 10){
-              console.log("WARNING: stopped rendering due to low zoom level.");
+            if (view.zoom < 11){
+              console.log("WARNING: stopped rendering due to low zoom level at", view.zoom, ".");
               polygonLayer.visible = false; 
               bikeLayer.visible = false; 
               pedLayer.visible = false; 
