@@ -11,18 +11,27 @@ Functionalities
 	- Display by colored bins* 
 	- Display by continuous spectrum
 
-Note* : 
+* Note: 
+
 Filter by value and display by colored bins are only available for Bie and Pie.  
 
 
 # Setting up data in ArcGIS Online 
 
 - Open up ArcGIS Pro 
-- Log in with University of Michigan Account 
-- (Not that login may not get you actually connected to ArcGIS Online portal the first time, you should do "Switch Account" on the top right corner, log in through ArcGIS website (www.arcgis-online.com), and then switch back again to UM account (umich.arcgis-online.com))
-- Create a blank new map
-- Drag the shapefiles into the legend of the new map, it should display on the map if successful 
-- Share data to online 
+- You would be prompted to log in with University of Michigan account
+- * Note that login may not get you actually connected to ArcGIS Online portal the first time, you should click "Switch Active Portal" on the top right corner, log in through ArcGIS website (www.arcgis.com) using Enterprise Login, and then do "Switch Active Portal" back again to UM account (umich.maps.arcgis.com), should work then. 
+- Start a new project
+- Create a blank new map (Insert -> New Map)
+- Drag the shapefiles into the content section of the new map, the data should be displayed on the map if successful 
+- Share data to online (have to share each shapefile individually)
+	- Right click on the dataset in the content
+	- Click "Sharing", then click "Share as web layer"
+	- Add name, summary, and tag
+	- For "Layer Type", select "Feature"
+	- For "Share With", select "Everyone" to make it a public layer
+	- Finally click "Analyze" for error checking and then "Publish"
+
 
 # Javascript reference 
 ArcGIS Javascript API site(https://developers.arcgis.com/javascript/)
