@@ -15,7 +15,7 @@ Note* :
 Filter by value and display by colored bins are only available for Bie and Pie.  
 
 
-#Setting up data in ArcGIS Online 
+# Setting up data in ArcGIS Online 
 
 - Open up ArcGIS Pro 
 - Log in with University of Michigan Account 
