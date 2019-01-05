@@ -59,6 +59,18 @@
         });
         // ==========================================================================
 
+        var fieldDictionary = {
+          "Bike_Index_of_the_Environment": "Bie", 
+          "Bike_Crash_Count": "BikeCrashC", 
+          "Bike_Exposure": "BikeExp", 
+          "Bike_Risk": "Bike_Risk", 
+          "Non_Motorized_Exposure": "NMExp", 
+          "Non_Motorized_Risk": "NMRisk", 
+          "Pedestrian_Crash_Count": "PedCrashCt", 
+          "Pedestrian_Exposure" :"PedExp", 
+          "Ped_Risk": "Ped_Risk", 
+          "Pedestrian_Index_of_the_Environment": "Pie"
+        };
         // Create the popup template for polygon 
         const popupTemplatePolygon = { // autocasts as new PopupTemplate()
           title: "Polygon information, FID: {FID}",
@@ -94,21 +106,21 @@
               }
             },{
               fieldName: "Bie",
-              label: "Bie",
+              label: "Bike_Index_of_the_Environment ",
               format: {
                 places: 0,
                 digitSeparator: true
               }
             }, {
               fieldName: "BikeCrashC",
-              label: "BikeCrashC",
+              label: "Bike_Crash_Count",
               format: {
                 places: 0,
                 digitSeparator: true
               }
             }, {
               fieldName: "BikeExp",
-              label: "BikeExp",
+              label: "Bike_Exposure",
               format: {
                 places: 0,
                 digitSeparator: true
@@ -129,14 +141,14 @@
               }
             }, {
               fieldName: "NMExp",
-              label: "NMExp",
+              label: "Non_Motorized_Exposure",
               format: {
                 places: 0,
                 digitSeparator: true
               }
             }, {
               fieldName: "NMRisk",
-              label: "NMRisk",
+              label: "Non_Motorized_Risk",
               format: {
                 places: 0,
                 digitSeparator: true
@@ -171,28 +183,28 @@
               }
             },{
               fieldName: "PedCrashCt",
-              label: "PedCrashCt",
+              label: "Pedestrian_Crash_Count",
               format: {
                 places: 0,
                 digitSeparator: true
               }
             }, {
               fieldName: "Pie",
-              label: "Pie",
+              label: "Pedestrian_Index_of_Environment ",
               format: {
                 places: 0,
                 digitSeparator: true
               }
             },{
               fieldName: "PedExp",
-              label: "PedExp",
+              label: "Pedestrial_Exposure",
               format: {
                 places: 0,
                 digitSeparator: true
               }
             }, {
               fieldName: "Ped_Risk",
-              label: "Ped_Risk",
+              label: "Pedestrian_Risk",
               format: {
                 places: 0,
                 digitSeparator: true
@@ -532,7 +544,7 @@
         // Definition of polygon renderer with continuous color 
         function generatePolygonRenderer(inputField){
 
-          const minMaxValue = findMaxMin(inputField); 
+          const minMaxValue = findMaxMin(fieldDictionary[inputField]); 
 
           const defaultSym = {
             type: "simple-fill", 
@@ -544,7 +556,7 @@
 
           const colorVisVar = {
             type: "color",
-            field: inputField,
+            field: fieldDictionary[inputField],
             stops: [
               { value: minMaxValue[0], color: "#FFFCD4" },
               { value: minMaxValue[1], color: "#0D2644" }
@@ -561,11 +573,11 @@
             visualVariables: colorVisVar
           };
 
-          if (inputField == "Pie"){
+          if (fieldDictionary[inputField] == "Pie"){
             rendererPolygon = rendererPolygonPie;
           }
 
-          else if (inputField == "Bie"){
+          else if (fieldDictionary[inputField] == "Bie"){
             rendererPolygon = rendererPolygonBie;
           }
 
@@ -573,7 +585,7 @@
         }
   
         // Setting the polygon renderer to Bie as default before the polygon is added
-        rendererPolygon = generatePolygonRenderer("Bie");
+        rendererPolygon = generatePolygonRenderer("Bike_Index_of_the_Environment");
 
         // Adding polygon featureLayer 
         const polygonLayer = new FeatureLayer({
@@ -656,8 +668,7 @@
               let result = results[0];
               highlight && highlight.remove();
 
-              // Update the graphic of the Feature widget
-              // on pointer-move with the result
+              // Update the graphic of the Feature widget on pointer-move with the result
               if (result) {
                 feature.graphic = result.graphic;
                 highlight = layerView.highlight(result.graphic);
@@ -716,7 +727,7 @@
           .then(addToSelect);
 
         function getValues(response) {
-          var fields = ["Bie", "BikeCrashC", "BikeExp", "Bike_Risk", "NMExp", "NMRisk", "PedCrashCt", "PedExp", "Ped_Risk", "Pie"];
+          var fields = ["Bike_Index_of_the_Environment", "Bike_Crash_Count", "Bike_Exposure", "Bike_Risk", "Non_Motorized_Exposure", "Non_Motorized_Risk", "Pedestrian_Crash_Count", "Pedestrian_Exposure", "Ped_Risk", "Pedestrian_Index_of_the_Environment"];
 
           return fields;
         }
@@ -731,30 +742,45 @@
           return setAttributeDefinitionExpression(attributeTypeSelect.value);
         }
 
+        var infoTypeDictionary = {
+          "Bike_Index_of_the_Environment": "pedestrian-index-of-the-environment-pie", 
+          "Bike_Crash_Count": "methodology", 
+          "Bike_Exposure":"exposure", 
+          "Bike_Risk" : "risk-score", 
+          "Non_Motorized_Exposure": "exposure",
+          "Non_Motorized_Risk" : "risk-score",
+          "Pedestrian_Crash_Count" : "methodology", 
+          "Pedestrian_Exposure" : "exposure", 
+          "Ped_Risk": "risk-score", 
+          "Pedestrian_Index_of_the_Environment": "pedestrian-index-of-the-environment-pie"
+        }; 
+
         // set the definition expression on the wells
         // layer to reflect the selection of the user
         function setAttributeDefinitionExpression(newValue) {
           polygonLayer.renderer = generatePolygonRenderer(newValue);
-
           if (!polygonLayer.visible) {
             polygonLayer.visible = true;
           }
         }
 
-        var attType = "Bie"; 
+        var attType = "Bike_Index_of_the_Environment"; 
         // event listening for attribute change 
         attributeTypeSelect.addEventListener("change", function () {
           attType = event.target.value;
           setAttributeDefinitionExpression(attType);
+          var infoUrl = "https://github.com/caocscar/pedbikeriskexposure/blob/master/draft.md#" + infoTypeDictionary[attType];
+          document.getElementById("infoUrl").href = infoUrl;
         });
 
         function findAttFilter(attribute, rangeValue){
-          if(attribute == "Bie" || attribute == "Pie" ){
+          console.log("Hi1", attribute);
+          if(attribute == "Bike_Index_of_the_Environment" || attribute == "Pedestrian_Index_of_the_Environment" ){
             if (rangeValue == 0) return 1000; 
             else if (rangeValue == 25) return 28.5; 
             else if (rangeValue == 50) return 28.5; 
             else if (rangeValue == 75) return 17.5; 
-            else if (rangeValue == 100) return 0; 
+            else if (rangeValue == 100) return 100; 
           }
           // else if (inputField == "BikeCrashC"){
           //   if (rangeValue == 0) return 1000; 
@@ -808,9 +834,10 @@
 
         function filterByValue(){
           var rangeSelectPercentage = parseInt(rangeSlider.value);
+          // console.log("Filter by value", attType, rangeSelectPercentage); 
           var rangeSelect = findAttFilter(attType, rangeSelectPercentage);
-          polygonLayer.definitionExpression = attType +" > " + rangeSelect;
-          if (rangeSelect == 0)
+          polygonLayer.definitionExpression = fieldDictionary[attType] +" > " + rangeSelect;
+          if (rangeSelect == 100) 
             polygonLayer.definitionExpression = ""; 
         }
 
@@ -822,6 +849,7 @@
         rangeSlider.addEventListener("change", function () {
           filterByValue();
         });
+
 
         /*****************************************************************
          * The visible property on the layer can be used to toggle the
@@ -854,15 +882,15 @@
             if (view.zoom < 11){
               console.log("WARNING: stopped rendering due to low zoom level at", view.zoom, ".");
               polygonLayer.visible = false; 
-              bikeLayer.visible = false; 
-              pedLayer.visible = false; 
+              lineBikeLayer.visible = false; 
+              linePedLayer.visible = false; 
               pointLayer.visible = false; 
             }
 
             else {
-              polygonLayer.visible = true; 
-              bikeLayer.visible = bikeLayerToggle.checked; 
-              pedLayer.visible = pedLayerToggle.checked; 
+              polygonLayer.visible = polygonLayerToggle.checked; 
+              lineBikeLayer.visible = bikeLayerToggle.checked; 
+              linePedLayer.visible = pedLayerToggle.checked; 
               pointLayer.visible = pointLayerToggle.checked; 
             }
           }
@@ -882,8 +910,22 @@
       font-family: sans-serif;
     }
 
+    #backgroundDiv {
+      top: 85px;
+      left: 15px;
+      position: absolute;
+      z-index: 99;
+      background-color: black;
+      color: White;
+      border-radius: 8px;
+      font-size:90%;
+      padding: 10px;
+      width: 220px;
+      opacity: 1;      
+    }
+
     #infoDiv {
-      top: 90px;
+      top: 160px;
       left: 15px;
       position: absolute;
       z-index: 99;
@@ -897,7 +939,7 @@
     }
 
     #layerToggle {
-      top: 170px;
+      top: 240px;
       left: 15px;
       position: absolute;
       z-index: 99;
@@ -921,13 +963,19 @@
 
 <body>
   <div class="panel-container">
+
+    <div id = "backgroundDiv">
+      Pedestrian and Bicyclist Safety Risk Assessment Tool <br/>
+      <a href="https://github.com/caocscar/pedbikeriskexposure/blob/master/draft.md" target="_blank" style="color:yellow">Reseach Info</a>
+    </div>
+
     <div id="infoDiv">
-      Select attribute type: <br/>
+      Select attribute: &nbsp;&nbsp;  
+        <a id="infoUrl" href="https://github.com/caocscar/pedbikeriskexposure/blob/master/draft.md#pedestrian-index-of-the-environment-pie" target="_blank" style="color:yellow"> Attribute Info </a> <br/> 
       <select id="att-type"></select> 
       <br> Range:
       <input id="range" type="range" min="25" max="100" step="25" value="100"> 
       <span id="range-value"> 100 </span>
-
 
     </div>
     
