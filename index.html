@@ -61,14 +61,12 @@
 
         var fieldDictionary = {
           "Bike_Index_of_the_Environment": "Bie", 
-          "Bike_Crash_Count": "BikeCrashC", 
           "Bike_Exposure": "BikeExp", 
           "Bike_Risk": "Bike_Risk", 
           "Non_Motorized_Exposure": "NMExp", 
           "Non_Motorized_Risk": "NMRisk", 
-          "Pedestrian_Crash_Count": "PedCrashCt", 
           "Pedestrian_Exposure" :"PedExp", 
-          "Ped_Risk": "Ped_Risk", 
+          "Pedestrian_Risk": "Ped_Risk", 
           "Pedestrian_Index_of_the_Environment": "Pie"
         };
         // Create the popup template for polygon 
@@ -727,7 +725,7 @@
           .then(addToSelect);
 
         function getValues(response) {
-          var fields = ["Bike_Index_of_the_Environment", "Bike_Crash_Count", "Bike_Exposure", "Bike_Risk", "Non_Motorized_Exposure", "Non_Motorized_Risk", "Pedestrian_Crash_Count", "Pedestrian_Exposure", "Ped_Risk", "Pedestrian_Index_of_the_Environment"];
+          var fields = ["Bike_Index_of_the_Environment", "Bike_Exposure", "Bike_Risk", "Non_Motorized_Exposure", "Non_Motorized_Risk", "Pedestrian_Exposure", "Pedestrian_Risk", "Pedestrian_Index_of_the_Environment"];
 
           return fields;
         }
@@ -744,15 +742,24 @@
 
         var infoTypeDictionary = {
           "Bike_Index_of_the_Environment": "pedestrian-index-of-the-environment-pie", 
-          "Bike_Crash_Count": "methodology", 
           "Bike_Exposure":"exposure", 
           "Bike_Risk" : "risk-score", 
           "Non_Motorized_Exposure": "exposure",
           "Non_Motorized_Risk" : "risk-score",
-          "Pedestrian_Crash_Count" : "methodology", 
           "Pedestrian_Exposure" : "exposure", 
-          "Ped_Risk": "risk-score", 
+          "Pedestrian_Risk": "risk-score", 
           "Pedestrian_Index_of_the_Environment": "pedestrian-index-of-the-environment-pie"
+        }; 
+
+        var rankDictionary = {
+          "Bike_Index_of_the_Environment": "BIErank", 
+          "Bike_Exposure":"BErank", 
+          "Bike_Risk" : "BRrank", 
+          "Non_Motorized_Exposure": "NMErank",
+          "Non_Motorized_Risk" : "NMRrank",
+          "Pedestrian_Exposure" : "PErank", 
+          "Pedestrian_Risk": "PRrank", 
+          "Pedestrian_Index_of_the_Environment": "PIErank"
         }; 
 
         // set the definition expression on the wells
@@ -765,6 +772,7 @@
         }
 
         var attType = "Bike_Index_of_the_Environment"; 
+        
         // event listening for attribute change 
         attributeTypeSelect.addEventListener("change", function () {
           attType = event.target.value;
@@ -773,72 +781,17 @@
           document.getElementById("infoUrl").href = infoUrl;
         });
 
-        function findAttFilter(attribute, rangeValue){
-          console.log("Hi1", attribute);
-          if(attribute == "Bike_Index_of_the_Environment" || attribute == "Pedestrian_Index_of_the_Environment" ){
-            if (rangeValue == 0) return 1000; 
-            else if (rangeValue == 25) return 28.5; 
-            else if (rangeValue == 50) return 28.5; 
-            else if (rangeValue == 75) return 17.5; 
-            else if (rangeValue == 100) return 100; 
-          }
-          // else if (inputField == "BikeCrashC"){
-          //   if (rangeValue == 0) return 1000; 
-          //   else if (rangeValue == 25) return 28.5; 
-          //   else if (rangeValue == 50) return 17.5; 
-          //   else if (rangeValue == 75) return 7; 
-          //   else if (rangeValue == 100) return 0; 
-          // }
-          // else if (inputField == "BikeExp"){
-          //   if (rangeValue == 0) return 1000; 
-          //   else if (rangeValue == 25) return 28.5; 
-          //   else if (rangeValue == 50) return 17.5; 
-          //   else if (rangeValue == 75) return 7; 
-          //   else if (rangeValue == 100) return 0; 
-          // }
-          // else if (inputField == "Bike_Risk"){
-          //   if (rangeValue == 0) return 1000; 
-          //   else if (rangeValue == 25) return 28.5; 
-          //   else if (rangeValue == 50) return 17.5; 
-          //   else if (rangeValue == 75) return 7; 
-          //   else if (rangeValue == 100) return 0; 
-          // }
-          // else if (inputField == "NMExp"){
-          //   if (rangeValue == 0) return 1000; 
-          //   else if (rangeValue == 25) return 28.5; 
-          //   else if (rangeValue == 50) return 17.5; 
-          //   else if (rangeValue == 75) return 7; 
-          //   else if (rangeValue == 100) return 0; 
-          // }
-          // else if (inputField == "NMRisk"){
-          //   if (rangeValue == 0) return 1000; 
-          //   else if (rangeValue == 25) return 28.5; 
-          //   else if (rangeValue == 50) return 17.5; 
-          //   else if (rangeValue == 75) return 7; 
-          //   else if (rangeValue == 100) return 0; 
-          // }
-          // else if (inputField == "PedCrashCt"){
-          //   return [0, 45];
-          // }
-          // else if (inputField == "PedExp"){
-          //   return [0, 30];
-          // }
-          // else if (inputField == "Ped_Risk"){
-          //   return [0, 3.8];
-          // }
-          // else {
-          //   console.log("Error in attribute max min value");
-          //   return [0, 10];
-          // }
-        }
-
         function filterByValue(){
           var rangeSelectPercentage = parseInt(rangeSlider.value);
-          // console.log("Filter by value", attType, rangeSelectPercentage); 
-          var rangeSelect = findAttFilter(attType, rangeSelectPercentage);
-          polygonLayer.definitionExpression = fieldDictionary[attType] +" > " + rangeSelect;
-          if (rangeSelect == 100) 
+
+          if (rangeSelectPercentage == 100) 
             polygonLayer.definitionExpression = ""; 
+          else{
+            polygonLayer.definitionExpression = rankDictionary[attType] +" <= " + rangeSelectPercentage+ 
+                                                " AND " + rankDictionary[attType] + " > 0";
+            // console.log(polygonLayer.definitionExpression);
+          }
+
         }
 
         // event listening to range change for filter 
@@ -866,11 +819,21 @@
         var pedLayerToggle = document.getElementById("pedLayer");
         pedLayerToggle.addEventListener("change", function () {
           linePedLayer.visible = pedLayerToggle.checked;
+          lineBikeLayer.visible = false; 
         });
+
         var bikeLayerToggle = document.getElementById("bikeLayer");
         bikeLayerToggle.addEventListener("change", function () {
           lineBikeLayer.visible = bikeLayerToggle.checked;
+          linePedLayer.visible = false; 
         });
+
+        var offLayerToggle = document.getElementById("offLayer");
+        offLayerToggle.addEventListener("change", function () {
+          lineBikeLayer.visible = false;
+          linePedLayer.visible = false; 
+        });
+
         var pointLayerToggle = document.getElementById("pointLayer");
         pointLayerToggle.addEventListener("change", function () {
           pointLayer.visible = pointLayerToggle.checked;
@@ -974,7 +937,7 @@
         <a id="infoUrl" href="https://github.com/caocscar/pedbikeriskexposure/blob/master/draft.md#pedestrian-index-of-the-environment-pie" target="_blank" style="color:yellow"> Attribute Info </a> <br/> 
       <select id="att-type"></select> 
       <br> Range:
-      <input id="range" type="range" min="25" max="100" step="25" value="100"> 
+      <input id="range" type="range" min="10" max="100" step="10" value="100"> 
       <span id="range-value"> 100 </span>
 
     </div>
@@ -982,9 +945,11 @@
     <span id="layerToggle">
       Layers <br/>
       <input type="checkbox" id="polygonLayer" checked> Polygon Layer <br/>
-      <input type="checkbox" id="pedLayer"> Ped Road Layer <br/>
-      <input type="checkbox" id="bikeLayer"> Bike Road Layer <br/>
-      <input type="checkbox" id="pointLayer"> Points of Interest Layer
+      <input type="checkbox" id="pointLayer"> Points of Interest Layer <br/>
+
+      <input type="radio" name="lineLayer" id="pedLayer"> Ped Road Layer <br/>
+      <input type="radio" name="lineLayer" id="bikeLayer"> Bike Road Layer <br/>
+      <input type="radio" name="lineLayer" id="offLayer"> Turn Off Road Layer 
     </span>
 
     <div id="viewDiv"></div>

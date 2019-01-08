@@ -13,8 +13,6 @@ Functionalities
 
 **Note**:
 
-_Filter by value_ and _display by colored bins_ are only available for Bie and Pie attribute.  
-
 
 # Setting up data in ArcGIS Online 
 
@@ -39,4 +37,4 @@ ArcGIS Javascript API site
 - [Sample code](https://developers.arcgis.com/javascript/latest/sample-code/index.html)
 
 # To do 
-- Files to MBox 
+- Change the data type for "weights" and "rank" in the line datasets  from strings to numbers in ArcGIS Pro.  
