@@ -11,8 +11,6 @@ Functionalities
 	- Display by colored bins* 
 	- Display by continuous spectrum
 
-**Note**:
-
 
 # Setting up data in ArcGIS Online 
 
